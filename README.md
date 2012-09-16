@@ -40,6 +40,21 @@ Dev on OSX 10.8
 Get GCC tools from here: https://github.com/kennethreitz/osx-gcc-installer/downloads
 
 * CherryPy-3.2.2
-* Imaging-1.1.7
 
+Install freetype: 
+
+    curl -O http://ftp.igh.cnrs.fr/pub/nongnu/freetype/freetype-2.4.5.tar.gz
+    tar -xvzf freetype-2.4.5.tar.gz
+    cd freetype-2.4.5
+    ./configure
+    make
+    sudo make install
+    cd ../
+
+Install PIL:
+
+    curl -O http://effbot.org/downloads/Imaging-1.1.7.tar.gz
+    tar -xvzf Imaging-1.1.7.tar.gz
+    cd Imaging-1.1.7
+    sudo python setup.py install
 Todo - install notes
