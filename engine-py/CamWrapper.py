@@ -26,3 +26,17 @@ class CamWrapper:
   result = urllib2.urlopen(request)
   im = Image.open(StringIO.StringIO(result.read()))
   return im
+ 
+ def AssembleImage(self,frames):
+  im = Image.new("RGB",(640,528))
+  im.paste(frames[0], (0, 0))
+  im.paste(frames[1], (213, 0))
+  im.paste(frames[2], (426, 0))
+  im.paste(frames[3], (0, 160))
+  im.paste(frames[4], (213, 160))
+  im.paste(frames[5], (426, 160))
+  im.paste(frames[6], (0, 320))
+  im.paste(frames[7], (213, 320))
+  im.paste(frames[8], (426, 320))
+  
+  return im

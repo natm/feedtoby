@@ -17,7 +17,7 @@ class CamMotion:
   self.cw = cw
   return
   
- def capture(self):
+ def capture(self,framesreq,resizex,resizey):
 		# load some settings
 		capsecs = self.cfg.getfloat("motion","capturesecs")
 		entropylevel = self.cfg.getfloat("motion","entropy")
@@ -53,17 +53,26 @@ class CamMotion:
 					timeappeared = taken
 					print "appeared."
 					if (capsecs - taken) < extendsecs:
+					 # increase capture window as near the end
 						capsecs = capsecs + extendsecs
 						print "extending cap seconds"
-						
-		self.frames = frames				
+			else:
+			 if frame > (frameappeared + framesreq):
+			  # taken enough now
+			  capsecs = taken
+			 
 		if frameappeared == -1:
 		 self.appeared = False
 		else:
 		 self.appeared = True
 		 self.appearedframe = frameappeared
 		 self.appearedsecs = timeappeared
-
+		 framesused = []
+		 for num in range(0,framesreq):
+		  framesused.append(frames[frameappeared + num].resize((212, 160), Image.ANTIALIAS)) 
+		 framesused.append(self.cw.SnapCam2().resize((212, 160), Image.ANTIALIAS))
+		 self.frames = framesused
+		
   
   
  # Function below is from: http://stackoverflow.com/questions/5524179/how-to-detect-motion-between-two-pil-images-wxpython-webcam-integration-exampl
