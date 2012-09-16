@@ -15,7 +15,8 @@ class FeedAction:
   cw = CamWrapper.CamWrapper(self.cfg)
   
   l = []
-  l.append
+  l.append(cw.SnapCam2())
+  l[0].save("blah2.jpg","JPEG")
   
   res = FeedResult.FeedResult()
   res.appeared = True
