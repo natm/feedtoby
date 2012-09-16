@@ -92,6 +92,8 @@ t = Twython(app_key=twconkey,
 
 auth_tokens = t.get_authorized_tokens()
 
+#t.updateStatusWithMedia("out.jpg",status='test')
+
 fs.incr("twitterverifyok")
 print ""
 print "Authenticated ok"

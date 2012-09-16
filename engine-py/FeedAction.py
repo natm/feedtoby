@@ -1,4 +1,5 @@
 import FeedResult
+import CamWrapper
 
 class FeedAction:
  """Control routine for doing the feed"""
@@ -10,6 +11,12 @@ class FeedAction:
   
  def DoFeed(self,twusername,twimg):
   print "feed him!!"
+  
+  cw = CamWrapper.CamWrapper(self.cfg)
+  
+  l = []
+  l.append
+  
   res = FeedResult.FeedResult()
   res.appeared = True
   return res

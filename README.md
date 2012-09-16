@@ -8,16 +8,15 @@ Dev on Debian Wheezy
 ====================
 In a clean netinst'd vm:
 
-    apt-get install openssh-server sudo git-core python python-argparse python-oauth2 python-cherrypy python-imaging
+    apt-get install openssh-server sudo git-core python python-argparse python-oauth2 python-cherrypy python-imaging python-setuptools
 
 Add yourself to /etc/sudoers
 
-Python Twitter API from Google code:
+Install twython:
 
     cd ~
-    git clone https://github.com/bear/python-twitter
-    cd python-twitter
-    touch README
+    git clone git://github.com/ryanmcgrath/twython.git
+    cd twython
     sudo python setup.py install
 
 Grab the latest feedtoby code:
