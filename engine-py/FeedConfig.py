@@ -19,7 +19,11 @@ class FeedConfig:
  
  def getboolean(self,section,option):
   return self.cfg.getboolean(section,option)
+
+ def getfloat(self,section,option):
+  return float(self.cfg.get(section,option))
  
+
  def getlist(self,sectionname):
   l = []
   list_items = self.cfg.items(sectionname)
