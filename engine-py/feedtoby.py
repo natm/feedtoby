@@ -18,7 +18,12 @@ def commandfeed(m):
   fs.incr("feedpermit")
   fa = FeedAction.FeedAction(fc)
   result = fa.DoFeed(m["user"]["screen_name"],m["user"]["profile_image_url"])
-  print "Appeared: %s" % (result.appeared)
+  if result.appeared == True:
+   print "Appeared"
+   fs.incr("feedappeared")
+  else:
+   print "Didnt feed: %s" % (result.reason)
+   fs.incr("feedfail")
  else:
   fs.incr("feeddecline")
 

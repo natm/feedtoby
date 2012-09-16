@@ -39,7 +39,6 @@ Dev on OSX 10.8
 
 Get GCC tools from here: https://github.com/kennethreitz/osx-gcc-installer/downloads
 
-* python-twitter-0.8.2
 * CherryPy-3.2.2
 * Imaging-1.1.7
 

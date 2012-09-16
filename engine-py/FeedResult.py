@@ -3,6 +3,7 @@ class FeedResult:
  appeared = False
  tweet = ""
  uploadedurl = ""
-
+ reason = ""
+ 
  def __init__(self):
   return
