@@ -6,3 +6,9 @@ engine-py/.DS_Store
 engine-py/live.cfg
 
 .DS_Store
+
+*.pyc
+
+*.pyc
+
+*.pyc

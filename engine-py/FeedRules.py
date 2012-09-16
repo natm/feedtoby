@@ -12,11 +12,11 @@ class FeedRules:
  def allowfeed(self,m):
   alwaysusers = self.c.getlist("alwaysfeed")
   permit = False;
-  if m.user.screen_name.lower() in alwaysusers:
+  if m["user"]["screen_name"].lower() in alwaysusers:
    permit = True
-  if m.user.verified == True:
+  if m["user"]["verified"] == True:
    permit = True
-  if m.user.followers_count > self.c.get("rules","followersoverride"):
+  if m["user"]["followers_count"] > self.c.get("rules","followersoverride"):
    permit = True
  
   now = datetime.datetime.now()

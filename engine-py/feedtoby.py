@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 import argparse
-import twitter
+from twython import Twython
 import cherrypy
 import time
 import logging
@@ -17,14 +17,14 @@ def commandfeed(m):
  if fr.allowfeed(m) == True:
   fs.incr("feedpermit")
   fa = FeedAction.FeedAction(fc)
-  result = fa.DoFeed(m.user.screen_name,m.user.profile_image_url)
+  result = fa.DoFeed(m["user"]["screen_name"],m["user"]["profile_image_url"])
   print "Appeared: %s" % (result.appeared)
  else:
   fs.incr("feeddecline")
 
 def processmention(m):
- log.info("%s %s %s" % (m.id,m.created_at,m.user.screen_name))
- tweet = m.text.lower().strip()
+ log.info("%s %s %s" % (m["id"],m["created_at"],m["user"]["screen_name"]))
+ tweet = m["text"].lower().strip()
  prefix = "@feedtoby"
  print tweet
  if tweet.startswith(prefix) == True:
@@ -37,21 +37,21 @@ def processmention(m):
 
 def checkmentions():
  lastmention = fc.get('lastmention','id')
- mentions = twapi.GetMentions(since_id=lastmention)
+ mentions = t.getUserMentions(since_id=lastmention)
  log.debug("%s mentions" % (len(mentions)))
  for m in reversed(mentions):
   fs.incr("mentions")
  #   config.set('lastmention','id',m.id)
-  fc.set('lastmention','datetime',m.created_at)
-  fc.set('lastmention','username',m.user.screen_name)
+  fc.set('lastmention','datetime',m["created_at"])
+  fc.set('lastmention','username',m["user"]["screen_name"])
   processmention(m)
 
 def accountstats():
- ustats = twapi.GetUser("feedtoby")
- fs.set("favourites",ustats.favourites_count)
- fs.set("followers",ustats.followers_count)
- fs.set("friends",ustats.friends_count)
- fs.set("tweets",ustats.statuses_count)
+ ustats = t.showUser(screen_name="feedtoby")
+ fs.set("favourites",ustats["favourites_count"])
+ fs.set("followers",ustats["followers_count"])
+ fs.set("friends",ustats["friends_count"])
+ fs.set("tweets",ustats["statuses_count"])
 
 
 
@@ -64,7 +64,7 @@ parser.add_argument('-o', help='only run once',action="store_true",dest='once',d
 args = parser.parse_args()
 
 # setup logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 log = logging.getLogger()
 
 # read config
@@ -85,9 +85,13 @@ twconsec = fc.get('twitter', 'consumer_secret')
 twacckey = fc.get('twitter', 'access_token_key')
 twaccsec = fc.get('twitter', 'access_token_secret')
 
-twapi = twitter.Api(consumer_key=twconkey,consumer_secret=twconsec,access_token_key=twacckey,access_token_secret=twaccsec)
+t = Twython(app_key=twconkey,
+            app_secret=twconsec,
+            oauth_token=twacckey,
+            oauth_token_secret=twaccsec)
 
-twapi.VerifyCredentials() 
+auth_tokens = t.get_authorized_tokens()
+
 fs.incr("twitterverifyok")
 print ""
 print "Authenticated ok"
