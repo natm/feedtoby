@@ -1,6 +1,6 @@
 import Image
 import urllib2, base64
-import Image
+from PIL import Image, ImageFont, ImageDraw
 import StringIO
 
 class CamWrapper:
@@ -38,5 +38,8 @@ class CamWrapper:
   im.paste(frames[6], (0, 320))
   im.paste(frames[7], (213, 320))
   im.paste(frames[8], (426, 320))
-  
+  draw = ImageDraw.Draw(im)
+  font = ImageFont.truetype("fonts/AveriaSans-Bold.ttf", 12)
+  draw.text((0, 500), "hello", font=font,fill='#fff')
+  del draw
   return im
