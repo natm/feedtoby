@@ -4,8 +4,11 @@ You can follow Toby - http://twitter.com/feedtoby
 
 And watch the original Youtube video - http://youtu.be/l2OkOEffdp0
 
-Dev on Debian Wheezy
-====================
+Installation notes
+------------------
+
+### Debian Wheezy
+
 In a clean netinst'd vm:
 
     apt-get install openssh-server sudo git-core python python-argparse python-oauth2 python-cherrypy python-imaging python-setuptools
@@ -29,13 +32,11 @@ Create yourself a configuration file or edit the example dev.cfg
     cd ~/feedtoby/engine-py
     ./feedtoby.py -c live.cfg
 
-Dev on Raspbian
-===============
+### Raspbian
 
 Todo
 
-Dev on OSX 10.8
-===============
+### OSX 10.8
 
 Get GCC tools from here: https://github.com/kennethreitz/osx-gcc-installer/downloads
 
