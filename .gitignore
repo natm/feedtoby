@@ -12,3 +12,5 @@ engine-py/live.cfg
 *.pyc
 
 *.pyc
+
+engine-py/FeedRules.pyc
