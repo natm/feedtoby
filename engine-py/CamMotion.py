@@ -45,17 +45,17 @@ class CamMotion:
 			# calculate difference between the images
 			img = ImageChops.difference(frames[len(frames)-1],frames[len(frames)-2])
 			ent = self.image_entropy(img)
-			print "f%s %0.2fe %0.1fs / %0.1fs" % (frame,ent,taken,capsecs)
+			# print "f%s %0.2fe %0.1fs / %0.1fs" % (frame,ent,taken,capsecs)
 			
 			if frameappeared == -1:
 				if float(ent) > entropylevel:
 					frameappeared = frame
 					timeappeared = taken
-					print "appeared."
+					# print "appeared."
 					if (capsecs - taken) < extendsecs:
 					 # increase capture window as near the end
 						capsecs = capsecs + extendsecs
-						print "extending cap seconds"
+						# print "extending cap seconds"
 			else:
 			 if frame > (frameappeared + framesreq):
 			  # taken enough now
