@@ -18,6 +18,8 @@ def commandfeed(m):
   fs.incr("feedpermit")
   fa = FeedAction.FeedAction(fc)
   result = fa.DoFeed(m["user"]["screen_name"],m["user"]["profile_image_url"])
+  if fc.getboolean("twitter","allow_tweet") == True:
+   t.updateStatusWithMedia("fed.jpg",status=result.tweet)
   if result.appeared == True:
    print "Appeared"
    fs.incr("feedappeared")
@@ -29,6 +31,7 @@ def commandfeed(m):
 
 def processmention(m):
  log.info("%s %s %s" % (m["id"],m["created_at"],m["user"]["screen_name"]))
+ print m["user"]["profile_image_url"]
  tweet = m["text"].lower().strip()
  prefix = "@feedtoby"
  print tweet
@@ -97,7 +100,6 @@ t = Twython(app_key=twconkey,
 
 auth_tokens = t.get_authorized_tokens()
 
-#t.updateStatusWithMedia("out.jpg",status='test')
 
 fs.incr("twitterverifyok")
 print ""

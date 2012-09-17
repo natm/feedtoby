@@ -4,6 +4,7 @@ class FeedResult:
  tweet = ""
  uploadedurl = ""
  reason = ""
+ imagefile = ""
  
  def __init__(self):
   return

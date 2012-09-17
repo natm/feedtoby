@@ -1,5 +1,6 @@
 import FeedResult
 import CamWrapper
+import CamMotion
 import urllib2
 import socket
 
@@ -16,10 +17,6 @@ class FeedAction:
   res = FeedResult.FeedResult()
   cw = CamWrapper.CamWrapper(self.cfg)
   
-  frames = []
-  frames.append(cw.SnapCam1())
-  #l[0].save("blah2.jpg","JPEG")
-  
   nanodetimeout = float(self.cfg.get("nanode","timeout"))
   
   print "Connecting to nanode, timeout %s secs" % (nanodetimeout)
@@ -33,8 +30,16 @@ class FeedAction:
     # reraise the original error
     raise
   
-  print "c"
-  
-
-  res.appeared = True
+  cm = CamMotion.CamMotion(self.cfg,cw)
+  cm.capture(8,212,160)
+  if cm.appeared == False:
+			print "Didn't appear"
+			res.appeared = False
+  else:
+			print "appeared at f%s @ %0.2fs" % (cm.appearedframe,cm.appearedsecs)
+			im = cw.AssembleImage(cm.frames,cm.appearedsecs,twusername,twimg)
+			im.save("fed.jpg","JPEG")
+			res.appeared = True
+			res.imagefile = "fed.jpg"
+			res.tweet = "Fed by @%s, got to feeder in %0.2fsecs #FeedToby" % (twusername,cm.appearedsecs)
   return res
