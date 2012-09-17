@@ -25,7 +25,12 @@ class FeedRules:
   if now.hour >= allowfrom and now.hour < allowto:
    # timeok, check when fed last
    lastfed = self.c.get("lastfed","datetime")
-   print lastfed
-   #  doesn't work from here on ************
-
+   t = datetime.datetime.strptime(lastfed,"%a %b %d %H:%M:%S +0000 %Y")
+   diff = datetime.datetime.now() - t
+   diffmins = (diff.seconds + (diff.days * 86400)) / 60
+   feedinterval = self.c.getint("rules","feed_interval")
+   
+   if diffmins > feedinterval:
+    permit = True
+  
   return permit

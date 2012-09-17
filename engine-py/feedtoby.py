@@ -4,6 +4,7 @@ import argparse
 from twython import Twython
 import cherrypy
 import time
+import datetime
 import logging
 import FeedAction
 import FeedConfig
@@ -25,7 +26,7 @@ def commandfeed(m):
    if fc.getboolean("twitter","allow_tweet") == True:
     t.updateStatusWithMedia("fed.jpg",status=result.tweet)
     fc.set("lastfed","username",m["user"]["screen_name"])
-    fc.set("lastfed","datetime",m["created_at"])
+    fc.set("lastfed","datetime",datetime.datetime.now().strftime("%a %b %d %H:%M:%S +0000 %Y"))
   else:
    print "Didnt feed: %s" % (result.reason)
    fs.incr("feedfail")
@@ -50,6 +51,13 @@ def checkmentions():
  lastmention = fc.get('lastmention','id')
  mentions = t.getUserMentions(since_id=lastmention)
  log.debug("%s mentions" % (len(mentions)))
+ 
+ lastfed = fc.get("lastfed","datetime")
+ lastfeddate = datetime.datetime.strptime(lastfed,"%a %b %d %H:%M:%S +0000 %Y")
+ diff = datetime.datetime.now() - lastfeddate
+ diffmins = (diff.seconds + (diff.days * 86400)) / 60
+ print "Lastfed %s mins ago, %s mentions" % (diffmins,len(mentions))
+ 
  for m in reversed(mentions):
   fs.incr("mentions")
   fc.set('lastmention','id',m["id"])
