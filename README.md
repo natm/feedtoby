@@ -7,7 +7,7 @@ And watch the original Youtube video - http://youtu.be/l2OkOEffdp0
 Installation notes
 ------------------
 
-### Debian Wheezy
+### Debian Wheezy - Vanilla install
 
 In a clean netinst'd vm:
 
@@ -32,7 +32,7 @@ Create yourself a configuration file or edit the example dev.cfg
     cd ~/feedtoby/engine-py
     ./feedtoby.py -c live.cfg
 
-### Raspbian
+### Raspbian Wheezey 
 
 Grab 2012-08-16-wheezy-raspbian.zip, extract and dd it onto an SD following notes similar to:
 
@@ -42,6 +42,7 @@ Change the default password and hostname, add IPv6 support:
 
     echo ipv6 >>/etc/modules
     
+Follow normal Wheezy vanilla install instructions above.
 
 ### OSX 10.7
 
@@ -67,3 +68,28 @@ Install PIL:
     sudo python setup.py install
  
 Todo - install notes, CherryPy-3.2.2 etc
+
+Remote access to the Pi Feeder
+------------------------------
+
+This creates a reverse SSH tunnel out from the Pi, so it can be plugged in on any home or NAT'd network and accessed remotely.
+
+Create /home/nat/reverse-ssh.sh
+
+    #!/bin/sh
+    
+    set -x
+    TARGET_HOST=${1}
+    TARGET_PORT=${2}
+    while true
+    do
+        echo "establishing reverse ssh tunnel to ${TARGET_HOST}:${TARGET_PORT}"
+        ssh -R ${TARGET_PORT}:localhost:22 -N ${TARGET_HOST} -o ServerAliveInterval=30
+        sleep 1
+    done
+
+Add public + private SSH keys to /home/nat/.ssh, create a dedicated user for this!
+
+Append these lines to /etc/rc.local
+
+    su -l nat -c "/home/nat/reverse-ssh.sh microserf.flarg.net 2221" >/tmp/reverse-ssh.log &
