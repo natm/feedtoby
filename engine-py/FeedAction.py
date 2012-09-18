@@ -19,12 +19,13 @@ class FeedAction:
   
   nanodetimeout = float(self.cfg.get("nanode","timeout"))
   
-  print "Connecting to nanode, timeout %s secs" % (nanodetimeout)
+  print "Connecting to nanode..."
   try:
    urllib2.urlopen(self.cfg.get("nanode","url"), timeout = nanodetimeout)
+   print "Connected"
   except urllib2.URLError, e:
    if isinstance(e.reason, socket.timeout):
-    res.reason = "Nanode timed out"
+    res.reason = "Nanode timed out (after %s secs)" % (nanodetimeout)
     return res
    else:
     # reraise the original error
@@ -33,8 +34,8 @@ class FeedAction:
   cm = CamMotion.CamMotion(self.cfg,cw)
   cm.capture(8,212,160)
   if cm.appeared == False:
-			print "Didn't appear"
 			res.appeared = False
+			res.reason = "Didn't appear"
   else:
 			print "appeared at f%s @ %0.2fs" % (cm.appearedframe,cm.appearedsecs)
 			im = cw.AssembleImage(cm.frames,cm.appearedsecs,twusername,twimg)

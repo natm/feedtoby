@@ -34,13 +34,20 @@ Create yourself a configuration file or edit the example dev.cfg
 
 ### Raspbian
 
-Todo
+Grab 2012-08-16-wheezy-raspbian.zip, extract and dd it onto an SD following notes similar to:
 
-### OSX 10.8
+    http://spicecoaster.wordpress.com/2012/09/14/raspberry-pi-installing-raspbian-os-preparing-sd-card/
+    
+Change the default password and hostname, add IPv6 support:
+
+    echo ipv6 >>/etc/modules
+    
+
+### OSX 10.7
 
 Get GCC tools from here: https://github.com/kennethreitz/osx-gcc-installer/downloads
 
-* CherryPy-3.2.2
+Install a git client.
 
 Install freetype: 
 
@@ -58,4 +65,5 @@ Install PIL:
     tar -xvzf Imaging-1.1.7.tar.gz
     cd Imaging-1.1.7
     sudo python setup.py install
-Todo - install notes
+ 
+Todo - install notes, CherryPy-3.2.2 etc
