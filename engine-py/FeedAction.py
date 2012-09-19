@@ -1,9 +1,9 @@
+from __future__ import print_function
 import FeedResult
 import CamWrapper
 import CamMotion
 import urllib2
 import socket
-from __future__ import print_function
 
 class FeedAction:
  """Control routine for doing the feed"""
@@ -23,9 +23,9 @@ class FeedAction:
   print('Connecting to nanode... ', end='')
   try:
    urllib2.urlopen(self.cfg.get("nanode","url"), timeout = nanodetimeout)
-   print "ok"
+   print("ok")
   except URLError, e:
-   print "error %s" % (e.code)
+   print("error %s" % (e.code))
    res.reason = " error %s (after %s secs)" % (e.code,nanodetimeout)
    #print e.read()
    return res
@@ -36,7 +36,7 @@ class FeedAction:
 			res.appeared = False
 			res.reason = "Didn't appear"
   else:
-			print "appeared at f%s @ %0.2fs" % (cm.appearedframe,cm.appearedsecs)
+			print("appeared at f%s @ %0.2fs" % (cm.appearedframe,cm.appearedsecs))
 			im = cw.AssembleImage(cm.frames,cm.appearedsecs,twusername,twimg)
 			im.save("fed.jpg","JPEG")
 			res.appeared = True

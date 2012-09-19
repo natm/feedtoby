@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 
+from __future__ import print_function
 import argparse
 from twython import Twython
 import cherrypy
@@ -12,7 +13,7 @@ import FeedResult
 import FeedRules
 import FeedStats
 import FeedWebserver
-from __future__ import print_function
+
     
 def commandfeed(m):
  fs.incr("feedattempt")
@@ -22,16 +23,16 @@ def commandfeed(m):
   result = fa.DoFeed(m["user"]["screen_name"],m["user"]["profile_image_url"])
 
   if result.appeared == True:
-   print "Appeared"
+   print("Appeared")
    fs.incr("feedappeared")
    if fc.getboolean("twitter","allow_tweet") == True:
     print('Tweeting... ', end='')
     t.updateStatusWithMedia("fed.jpg",status=result.tweet)
-    print "ok"
+    print("ok")
     fc.set("lastfed","username",m["user"]["screen_name"])
     fc.set("lastfed","datetime",datetime.datetime.now().strftime("%a %b %d %H:%M:%S +0000 %Y"))
   else:
-   print "Didnt feed: %s" % (result.reason)
+   print("Didnt feed: %s" % (result.reason))
    fs.incr("feedfail")
  else:
   fs.incr("feeddecline")
@@ -40,8 +41,8 @@ def processmention(m):
  #log.info("%s %s %s" % (m["id"],m["created_at"],m["user"]["screen_name"]))
  tweet = m["text"].lower().strip()
  prefix = "@feedtoby"
- print "%s - %s" % (m["user"]["screen_name"],tweet)
- print ""
+ print("%s - %s" % (m["user"]["screen_name"],tweet))
+ print("")
  if tweet.startswith(prefix) == True:
   start = len(prefix)
   end = len(tweet)
@@ -60,7 +61,7 @@ def checkmentions():
  lastfeddate = datetime.datetime.strptime(lastfed,"%a %b %d %H:%M:%S +0000 %Y")
  diff = datetime.datetime.now() - lastfeddate
  diffmins = (diff.seconds + (diff.days * 86400)) / 60
- print "%s mentions, %s last fed mins ago" % (len(mentions),diffmins)
+ print("%s mentions, %s last fed mins ago" % (len(mentions),diffmins))
  
  for m in reversed(mentions):
   fs.incr("mentions")
@@ -117,9 +118,9 @@ auth_tokens = t.get_authorized_tokens()
 
 
 fs.incr("twitterverifyok")
-print ""
-print "Authenticated ok"
-print ""
+print("")
+print("Authenticated ok")
+print("")
 # print "Last mention %s at %s" % (fc.get('lastmention','id'),fc.get('lastmention','datetime'))
 
 # start operations
@@ -146,4 +147,4 @@ while doloop == True:
 
  time.sleep(1)
 
-print "Exiting"
+print("Exiting")
