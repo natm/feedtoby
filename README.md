@@ -11,7 +11,7 @@ Installation notes
 
 In a clean netinst'd vm:
 
-    apt-get install openssh-server sudo git-core python python-argparse python-oauth2 python-cherrypy python-imaging python-setuptools
+    apt-get install openssh-server sudo screen git-core python python-argparse python-oauth2 python-cherrypy python-imaging python-setuptools
 
 Add yourself to /etc/sudoers
 
