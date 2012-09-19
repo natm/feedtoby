@@ -23,13 +23,11 @@ class FeedAction:
   try:
    urllib2.urlopen(self.cfg.get("nanode","url"), timeout = nanodetimeout)
    print "Connected"
-  except urllib2.URLError, e:
-   if isinstance(e.reason, socket.timeout):
-    res.reason = "Nanode timed out (after %s secs)" % (nanodetimeout)
-    return res
-   else:
-    # reraise the original error
-    raise
+  except URLError, e:
+   print e.code
+   res.reason = "Unable to connect %s (after %s secs)" % (e.code,nanodetimeout)
+   #print e.read()
+   return res
   
   cm = CamMotion.CamMotion(self.cfg,cw)
   cm.capture(8,212,160)
