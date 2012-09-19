@@ -22,6 +22,13 @@ Install twython:
     cd twython
     sudo python setup.py install
 
+Install termcolor:
+
+    curl -O http://pypi.python.org/packages/source/t/termcolor/termcolor-1.1.0.tar.gz
+    tar -xvzf termcolor-1.1.0.tar.gz
+    cd termcolor-1.1.0
+    sudo python setup.py install
+    
 Grab the latest feedtoby code:
 
     cd ~
@@ -65,6 +72,13 @@ Install PIL:
     curl -O http://effbot.org/downloads/Imaging-1.1.7.tar.gz
     tar -xvzf Imaging-1.1.7.tar.gz
     cd Imaging-1.1.7
+    sudo python setup.py install
+ 
+Install termcolor:
+
+    curl -O http://pypi.python.org/packages/source/t/termcolor/termcolor-1.1.0.tar.gz
+    tar -xvzf termcolor-1.1.0.tar.gz
+    cd termcolor-1.1.0
     sudo python setup.py install
  
 Todo - install notes, CherryPy-3.2.2 etc

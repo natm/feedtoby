@@ -4,6 +4,8 @@ import CamWrapper
 import CamMotion
 import urllib2
 import socket
+import sys
+from termcolor import colored, cprint
 
 class FeedAction:
  """Control routine for doing the feed"""
@@ -20,12 +22,12 @@ class FeedAction:
   
   nanodetimeout = float(self.cfg.get("nanode","timeout"))
   
-  print('Connecting to nanode... ', end='')
+  cprint('Connecting to nanode: ', 'cyan', end='')
   try:
    urllib2.urlopen(self.cfg.get("nanode","url"), timeout = nanodetimeout)
-   print("ok")
+   cprint('ok', 'green')
   except URLError, e:
-   print("error %s" % (e.code))
+   cprint(("error %s" % (e.code)), 'red')
    res.reason = " error %s (after %s secs)" % (e.code,nanodetimeout)
    #print e.read()
    return res

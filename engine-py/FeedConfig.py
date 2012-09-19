@@ -1,4 +1,5 @@
 import ConfigParser
+import datetime
 
 class FeedConfig:
  """Feeder configuration routines"""
@@ -23,6 +24,12 @@ class FeedConfig:
  def getfloat(self,section,option):
   return float(self.cfg.get(section,option))
  
+ def getminsince(self,section,option):
+  val = self.cfg.get(section,option)
+  valdate = datetime.datetime.strptime(val,"%a %b %d %H:%M:%S +0000 %Y")
+  diff = datetime.datetime.now() - valdate
+  mins = (diff.seconds + (diff.days * 86400)) / 60
+  return mins
 
  def getlist(self,sectionname):
   l = []

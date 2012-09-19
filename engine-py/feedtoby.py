@@ -13,7 +13,8 @@ import FeedResult
 import FeedRules
 import FeedStats
 import FeedWebserver
-
+import sys
+from termcolor import colored, cprint
     
 def commandfeed(m):
  fs.incr("feedattempt")
@@ -23,26 +24,24 @@ def commandfeed(m):
   result = fa.DoFeed(m["user"]["screen_name"],m["user"]["profile_image_url"])
 
   if result.appeared == True:
-   print("Appeared")
    fs.incr("feedappeared")
    if fc.getboolean("twitter","allow_tweet") == True:
-    print('Tweeting... ', end='')
+    cprint('Tweeting: ', 'cyan', end='')
     t.updateStatusWithMedia("fed.jpg",status=result.tweet)
-    print("ok")
+    cprint('ok', 'green')
     fc.set("lastfed","username",m["user"]["screen_name"])
     fc.set("lastfed","datetime",datetime.datetime.now().strftime("%a %b %d %H:%M:%S +0000 %Y"))
   else:
-   print("Didnt feed: %s" % (result.reason))
+   cprint(("Didnt feed: %s" % (result.reason)), 'red')
    fs.incr("feedfail")
  else:
   fs.incr("feeddecline")
 
 def processmention(m):
- #log.info("%s %s %s" % (m["id"],m["created_at"],m["user"]["screen_name"]))
  tweet = m["text"].lower().strip()
  prefix = "@feedtoby"
- print("%s - %s" % (m["user"]["screen_name"],tweet))
- print("")
+ cprint("@" + m["user"]["screen_name"], 'magenta', end='')
+ cprint(" " + tweet, 'white')
  if tweet.startswith(prefix) == True:
   start = len(prefix)
   end = len(tweet)
@@ -52,23 +51,40 @@ def processmention(m):
     commandfeed(m)
 
 def checkmentions():
- print('Polling... ', end='')
+ cprint('Polling: ', 'cyan', end='')
  lastmention = fc.get('lastmention','id')
- mentions = t.getUserMentions(since_id=lastmention)
- #log.debug("%s mentions" % (len(mentions)))
+ mentionsok = False
+ try:
+  mentions = t.getUserMentions(since_id=lastmention)
+  mennum = len(mentions)
+  mentionsok = True
+ except URLError, e:
+   cprint("Twitter API error %s" % (e.code),'red')
  
- lastfed = fc.get("lastfed","datetime")
- lastfeddate = datetime.datetime.strptime(lastfed,"%a %b %d %H:%M:%S +0000 %Y")
- diff = datetime.datetime.now() - lastfeddate
- diffmins = (diff.seconds + (diff.days * 86400)) / 60
- print("%s mentions, %s last fed mins ago" % (len(mentions),diffmins))
+ if mentionsok == True:
+  mentions = t.getUserMentions(since_id=lastmention)
  
- for m in reversed(mentions):
-  fs.incr("mentions")
-  fc.set('lastmention','id',m["id"])
-  fc.set('lastmention','datetime',m["created_at"])
-  fc.set('lastmention','username',m["user"]["screen_name"])
-  processmention(m)
+  minsfed = fc.getminsince("lastfed","datetime")
+  
+  cprint('ok', 'green', end='')
+  
+  txtmention = ""
+  if mennum == 0:
+   txtmention= ""
+  elif mennum == 1:
+   txtmention = " 1 mention,"
+  else:
+   txtmention = " %s mentions," % (mennum)
+    
+  txt = "%s last fed %s mins" % (txtmention,minsfed)
+  cprint(txt,'yellow')
+  
+  for m in reversed(mentions):
+   fs.incr("mentions")
+   fc.set('lastmention','id',m["id"])
+   fc.set('lastmention','datetime',m["created_at"])
+   fc.set('lastmention','username',m["user"]["screen_name"])
+   processmention(m)
 
 def accountstats():
  ustats = t.showUser(screen_name="feedtoby")
@@ -113,14 +129,13 @@ t = Twython(app_key=twconkey,
             app_secret=twconsec,
             oauth_token=twacckey,
             oauth_token_secret=twaccsec)
-
+            
+cprint('Authenticating: ', 'cyan', end='')
 auth_tokens = t.get_authorized_tokens()
-
+cprint('ok', 'green')
 
 fs.incr("twitterverifyok")
-print("")
-print("Authenticated ok")
-print("")
+
 # print "Last mention %s at %s" % (fc.get('lastmention','id'),fc.get('lastmention','datetime'))
 
 # start operations
