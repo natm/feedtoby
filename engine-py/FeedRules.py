@@ -1,3 +1,5 @@
+import datetime
+
 class FeedRules:
  """Rules on if Toby can be fed or not"""
  c = None
