@@ -50,7 +50,7 @@ def processmention(m):
 def checkmentions():
  lastmention = fc.get('lastmention','id')
  mentions = t.getUserMentions(since_id=lastmention)
- log.debug("%s mentions" % (len(mentions)))
+ #log.debug("%s mentions" % (len(mentions)))
  
  lastfed = fc.get("lastfed","datetime")
  lastfeddate = datetime.datetime.strptime(lastfed,"%a %b %d %H:%M:%S +0000 %Y")
@@ -83,8 +83,8 @@ parser.add_argument('-o', help='only run once',action="store_true",dest='once',d
 args = parser.parse_args()
 
 # setup logging
-logging.basicConfig(level=logging.INFO)
-log = logging.getLogger()
+#logging.basicConfig(level=logging.INFO)
+#log = logging.getLogger()
 
 # read config
 fc = FeedConfig.FeedConfig(args.cfgfile)
