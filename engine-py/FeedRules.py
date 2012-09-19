@@ -27,7 +27,7 @@ class FeedRules:
    minsfed = self.c.getminsince("lastfed","datetime")
    feedinterval = self.c.getint("rules","feed_interval")
    
-   if diffmins > feedinterval:
+   if minsfed > feedinterval:
     permit = True
   
   return permit

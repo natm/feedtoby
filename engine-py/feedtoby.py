@@ -81,10 +81,10 @@ def checkmentions():
   
   for m in reversed(mentions):
    fs.incr("mentions")
+   processmention(m)
    fc.set('lastmention','id',m["id"])
    fc.set('lastmention','datetime',m["created_at"])
    fc.set('lastmention','username',m["user"]["screen_name"])
-   processmention(m)
 
 def accountstats():
  ustats = t.showUser(screen_name="feedtoby")
