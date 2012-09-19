@@ -12,6 +12,7 @@ import FeedResult
 import FeedRules
 import FeedStats
 import FeedWebserver
+from __future__ import print_function
     
 def commandfeed(m):
  fs.incr("feedattempt")
@@ -24,7 +25,9 @@ def commandfeed(m):
    print "Appeared"
    fs.incr("feedappeared")
    if fc.getboolean("twitter","allow_tweet") == True:
+    print('Tweeting... ', end='')
     t.updateStatusWithMedia("fed.jpg",status=result.tweet)
+    print "ok"
     fc.set("lastfed","username",m["user"]["screen_name"])
     fc.set("lastfed","datetime",datetime.datetime.now().strftime("%a %b %d %H:%M:%S +0000 %Y"))
   else:
@@ -48,6 +51,7 @@ def processmention(m):
     commandfeed(m)
 
 def checkmentions():
+ print('Polling... ', end='')
  lastmention = fc.get('lastmention','id')
  mentions = t.getUserMentions(since_id=lastmention)
  #log.debug("%s mentions" % (len(mentions)))
@@ -56,7 +60,7 @@ def checkmentions():
  lastfeddate = datetime.datetime.strptime(lastfed,"%a %b %d %H:%M:%S +0000 %Y")
  diff = datetime.datetime.now() - lastfeddate
  diffmins = (diff.seconds + (diff.days * 86400)) / 60
- print "Lastfed %s mins ago, %s mentions" % (diffmins,len(mentions))
+ print "%s mentions, %s last fed mins ago" % (len(mentions),diffmins)
  
  for m in reversed(mentions):
   fs.incr("mentions")

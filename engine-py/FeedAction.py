@@ -3,6 +3,7 @@ import CamWrapper
 import CamMotion
 import urllib2
 import socket
+from __future__ import print_function
 
 class FeedAction:
  """Control routine for doing the feed"""
@@ -19,13 +20,13 @@ class FeedAction:
   
   nanodetimeout = float(self.cfg.get("nanode","timeout"))
   
-  print "Connecting to nanode..."
+  print('Connecting to nanode... ', end='')
   try:
    urllib2.urlopen(self.cfg.get("nanode","url"), timeout = nanodetimeout)
-   print "Connected"
+   print "ok"
   except URLError, e:
-   print e.code
-   res.reason = "Unable to connect %s (after %s secs)" % (e.code,nanodetimeout)
+   print "error %s" % (e.code)
+   res.reason = " error %s (after %s secs)" % (e.code,nanodetimeout)
    #print e.read()
    return res
   
