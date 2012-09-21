@@ -26,9 +26,9 @@ class FeedAction:
   try:
    urllib2.urlopen(self.cfg.get("nanode","url"), timeout = nanodetimeout)
    cprint('ok', 'green')
-  except URLError, e:
-   cprint(("error %s" % (e.code)), 'red')
-   res.reason = " error %s (after %s secs)" % (e.code,nanodetimeout)
+  except urllib2.URLError, e:
+   cprint("error", 'red')
+   res.reason = " error (after %s secs)" % (nanodetimeout)
    #print e.read()
    return res
   

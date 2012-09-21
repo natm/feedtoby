@@ -87,12 +87,16 @@ def checkmentions():
    fc.set('lastmention','username',m["user"]["screen_name"])
 
 def accountstats():
- ustats = t.showUser(screen_name="feedtoby")
- fs.set("favourites",ustats["favourites_count"])
- fs.set("followers",ustats["followers_count"])
- fs.set("friends",ustats["friends_count"])
- fs.set("tweets",ustats["statuses_count"])
-
+ cprint('Getting account stats: ', 'cyan', end='')
+ try:
+		ustats = t.showUser(screen_name="feedtoby")
+		fs.set("favourites",ustats["favourites_count"])
+		fs.set("followers",ustats["followers_count"])
+		fs.set("friends",ustats["friends_count"])
+		fs.set("tweets",ustats["statuses_count"])
+		cprint('ok', 'green')
+ except URLError, e:
+   cprint("Twitter API error %s" % (e.code),'red')
 
 
 #main stuff...
