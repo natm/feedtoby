@@ -14,6 +14,7 @@ import FeedRules
 import FeedStats
 import FeedWebserver
 import sys
+import urllib2
 from termcolor import colored, cprint
     
 def commandfeed(m):
@@ -58,8 +59,8 @@ def checkmentions():
   mentions = t.getUserMentions(since_id=lastmention)
   mennum = len(mentions)
   mentionsok = True
- except URLError, e:
-   cprint("Twitter API error %s" % (e.code),'red')
+ except:
+   cprint("Twitter API error %s" % (sys.exc_info()[0]),'red')
  
  if mentionsok == True:
   mentions = t.getUserMentions(since_id=lastmention)
@@ -87,7 +88,7 @@ def checkmentions():
    fc.set('lastmention','username',m["user"]["screen_name"])
 
 def accountstats():
- cprint('Getting account stats: ', 'cyan', end='')
+ cprint('Stats: ', 'cyan', end='')
  try:
 		ustats = t.showUser(screen_name="feedtoby")
 		fs.set("favourites",ustats["favourites_count"])
@@ -95,8 +96,8 @@ def accountstats():
 		fs.set("friends",ustats["friends_count"])
 		fs.set("tweets",ustats["statuses_count"])
 		cprint('ok', 'green')
- except URLError, e:
-   cprint("Twitter API error %s" % (e.code),'red')
+ except:
+   cprint("Twitter API error %s" % (sys.exc_info()[0]),'red')
 
 
 #main stuff...
