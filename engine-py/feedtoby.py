@@ -156,11 +156,11 @@ while doloop == True:
  if args.once == True:
   doloop = False
 
- if (time.time() - tmentions) > 25:
+ if (time.time() - tmentions) > 30:
   tmentions = time.time()
   checkmentions()
 
- if (time.time() - taccstats) > 180:
+ if (time.time() - taccstats) > 600:
   taccstats = time.time()
   accountstats()
 

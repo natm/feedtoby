@@ -11,8 +11,9 @@ class FeedRules:
   
  def allowfeed(self,m):
   alwaysusers = self.c.getlist("alwaysfeed")
+  screenname = m["user"]["screen_name"].lower()
   permit = False;
-  if m["user"]["screen_name"].lower() in alwaysusers:
+  if screenname in alwaysusers:
    permit = True
   if m["user"]["verified"] == True:
    permit = True
@@ -30,4 +31,8 @@ class FeedRules:
    if minsfed > feedinterval:
     permit = True
   
+  if screenname == "feedtoby":
+   # dont let him feed himself
+   permit = False
+     
   return permit
