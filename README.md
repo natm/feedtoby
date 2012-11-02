@@ -97,7 +97,7 @@ Create /home/nat/reverse-ssh.sh
     TARGET_PORT=${2}
     while true
     do
-        echo "establishing reverse ssh tunnel to ${TARGET_HOST}:${TARGET_PORT}"
+        echo "$(date -d "today" +"%Y-%m-%d %H:%M") establishing reverse ssh tunnel to ${TARGET_HOST}:${TARGET_PORT}"
         ssh -R ${TARGET_PORT}:localhost:22 -N ${TARGET_HOST} -o ServerAliveInterval=30
         sleep 1
     done
