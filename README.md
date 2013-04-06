@@ -107,3 +107,24 @@ Add public + private SSH keys to /home/nat/.ssh, create a dedicated user for thi
 Append these lines to /etc/rc.local
 
     su -l nat -c "/home/nat/reverse-ssh.sh microserf.flarg.net 2221" >/tmp/reverse-ssh.log &
+<<<<<<< HEAD
+=======
+    
+    
+    
+    
+Setting up dev environment
+--------------------------
+
+    ssh git@github.com
+    git clone git@github.com:natm/feedtoby.git
+
+See whats changed
+
+    git status
+    
+Commit and push
+
+    git commit -a -m "blah blah"
+    git push origin master
+>>>>>>> Updated readme
