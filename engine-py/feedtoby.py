@@ -50,8 +50,8 @@ def uploadmedia(filename,statustxt):
  accsec = fc.get('twitter', 'access_token_secret')
  auth = tweepy.OAuthHandler(conkey,consec)
  auth.set_access_token(acckey,accsec)
- twapi = tweepy.API(auth)
- twapi.status_update_with_media(filename,status=statustxt)
+ tweepyapi = tweepy.API(auth)
+ tweepyapi.status_update_with_media(filename,status=statustxt)
 
 def processmention(m):
  tweet = m["text"].lower().strip()
@@ -79,7 +79,6 @@ def checkmentions():
  
  if mentionsok == True:
   mentions = twapi("/1.1/statuses/mentions_timeline.json?since_id=%s" % lastmention) 
-  mentions = twapi("/1.1/statuses/mentions_timeline.json") 
   minsfed = fc.getminsince("lastfed","datetime")
   
   cprint('ok', 'green', end='')
@@ -210,14 +209,11 @@ access_token = oauth.Token(key=twacckey, secret=twaccsec)
 client = oauth.Client(consumer, access_token)
 tweets = twapi("/1/statuses/home_timeline.json")
 
-if len(tweets["errors"]) > 0:
- cprint('oauth error','red')
+if 'errors' in tweets:
+ cprint(tweets['errors'][0]['message'],'red')
  sys.exit()
 else:
  cprint('ok', 'green')
-
-mentions = twapi("/1.1/statuses/mentions_timeline.json") 
-print(mentions)
 
 fs.incr("twitterverifyok")
 
