@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 
 from __future__ import print_function
+import tweepy     # from: https://github.com/slothyrulez/tweepy/
 import argparse
-from twython import Twython
 import cherrypy
 import time
 import datetime
@@ -15,7 +15,11 @@ import FeedStats
 import FeedWebserver
 import sys
 import urllib2
+import urlparse
+import oauth2 as oauth
+import json
 from termcolor import colored, cprint
+
     
 def commandfeed(m):
  fs.incr("feedattempt")
@@ -28,7 +32,7 @@ def commandfeed(m):
    fs.incr("feedappeared")
    if fc.getboolean("twitter","allow_tweet") == True:
     cprint('Tweeting: ', 'cyan', end='')
-    t.updateStatusWithMedia("fed.jpg",status=result.tweet)
+    uploadmedia("fed.jpg",result.tweet)
     cprint('ok', 'green')
     fc.set("lastfed","username",m["user"]["screen_name"])
     fc.set("lastfed","datetime",datetime.datetime.now().strftime("%a %b %d %H:%M:%S +0000 %Y"))
@@ -37,6 +41,16 @@ def commandfeed(m):
    fs.incr("feedfail")
  else:
   fs.incr("feeddecline")
+
+def uploadmedia(filename,statustxt):
+ conkey = fc.get('twitter', 'consumer_key')
+ consec = fc.get('twitter', 'consumer_secret')
+ acckey = fc.get('twitter', 'access_token_key')
+ accsec = fc.get('twitter', 'access_token_secret')
+ auth = tweepy.OAuthHandler(conkey,consec)
+ auth.set_access_token(acckey,accsec)
+ twapi = tweepy.API(auth)
+ twapi.status_update_with_media(filename,status=statustxt)
 
 def processmention(m):
  tweet = m["text"].lower().strip()
@@ -56,15 +70,14 @@ def checkmentions():
  lastmention = fc.get('lastmention','id')
  mentionsok = False
  try:
-  mentions = t.getUserMentions(since_id=lastmention)
+  mentions = twapi("/1.1/statuses/mentions_timeline.json?since_id=%s" % lastmention)
   mennum = len(mentions)
   mentionsok = True
  except:
    cprint("Twitter API error %s" % (sys.exc_info()[0]),'red')
  
  if mentionsok == True:
-  mentions = t.getUserMentions(since_id=lastmention)
- 
+  mentions = twapi("/1.1/statuses/mentions_timeline.json?since_id=%s" % lastmention) 
   minsfed = fc.getminsince("lastfed","datetime")
   
   cprint('ok', 'green', end='')
@@ -79,7 +92,7 @@ def checkmentions():
     
   txt = "%s last fed %s mins" % (txtmention,minsfed)
   cprint(txt,'yellow')
-  
+
   for m in reversed(mentions):
    fs.incr("mentions")
    processmention(m)
@@ -87,10 +100,16 @@ def checkmentions():
    fc.set('lastmention','datetime',m["created_at"])
    fc.set('lastmention','username',m["user"]["screen_name"])
 
+def twapi(url):
+ endpoint = ("https://api.twitter.com%s" % url)
+ response, data = client.request(endpoint)
+ jsondata = json.loads(data)
+ return jsondata
+
 def accountstats():
  cprint('Stats: ', 'cyan', end='')
  try:
-		ustats = t.showUser(screen_name="feedtoby")
+		ustats = twapi("/1/users/show.json?screen_name=feedtoby")
 		fs.set("favourites",ustats["favourites_count"])
 		fs.set("followers",ustats["followers_count"])
 		fs.set("friends",ustats["friends_count"])
@@ -106,6 +125,7 @@ def accountstats():
 parser = argparse.ArgumentParser(description='Feedtoby daemon')
 parser.add_argument('-c', help='configuration filename',action='store',dest='cfgfile',required=True)
 parser.add_argument('-o', help='only run once',action="store_true",dest='once',default=False)
+parser.add_argument('-a', help='oauth setup',action="store_true",dest='oauth',default=False)
 args = parser.parse_args()
 
 # setup logging
@@ -127,17 +147,24 @@ fs.incr("started")
 
 twconkey = fc.get('twitter', 'consumer_key')
 twconsec = fc.get('twitter', 'consumer_secret')
+
+# refresh access key and secret
+if args.oauth == True:
+ oauthverify()
+ sys.exit()
+
 twacckey = fc.get('twitter', 'access_token_key')
 twaccsec = fc.get('twitter', 'access_token_secret')
 
-t = Twython(app_key=twconkey,
-            app_secret=twconsec,
-            oauth_token=twacckey,
-            oauth_token_secret=twaccsec)
-            
 cprint('Authenticating: ', 'cyan', end='')
-auth_tokens = t.get_authorized_tokens()
-cprint('ok', 'green')
+consumer = oauth.Consumer(key=twconkey, secret=twconsec)
+access_token = oauth.Token(key=twacckey, secret=twaccsec)
+client = oauth.Client(consumer, access_token)
+tweets = twapi("/1/statuses/home_timeline.json")
+if len(tweets) > 0:
+ cprint('ok', 'green')
+else:
+ sys.exit() 
 
 fs.incr("twitterverifyok")
 
@@ -168,3 +195,47 @@ while doloop == True:
  time.sleep(1)
 
 print("Exiting")
+sys.exit()
+
+
+def oauthverify():
+ cprint('OAuth setup','cyan')
+ cprint('App key:     ', 'yellow', end='')
+ cprint(twconkey,'green')
+ cprint('App secret:  ', 'yellow', end='')
+ cprint(twconsec,'green')
+
+ consumer_key = fc.get('twitter', 'consumer_key')
+ consumer_secret = fc.get('twitter', 'consumer_secret')
+
+ request_token_url = 'https://api.twitter.com/oauth/request_token'
+ access_token_url = 'https://api.twitter.com/oauth/access_token'
+ authorize_url = 'https://api.twitter.com/oauth/authorize'
+
+ consumer = oauth.Consumer(consumer_key, consumer_secret)
+ client = oauth.Client(consumer)
+
+ resp, content = client.request(request_token_url, "GET")
+ if resp['status'] != '200':
+  raise Exception("Invalid response %s." % resp['status'])
+
+ request_token = dict(urlparse.parse_qsl(content))
+
+ print("Go to the following link in your browser:")
+ print("%s?oauth_token=%s" % (authorize_url, request_token['oauth_token']))
+
+ accepted = 'n'
+ while accepted.lower() == 'n':
+  accepted = raw_input('Have you authorized me? (y/n) ')
+ oauth_verifier = raw_input('What is the PIN? ')
+
+ token = oauth.Token(request_token['oauth_token'],request_token['oauth_token_secret'])
+ token.set_verifier(oauth_verifier)
+ client = oauth.Client(consumer, token)
+ resp, content = client.request(access_token_url, "POST")
+ access_token = dict(urlparse.parse_qsl(content))
+ print("    - oauth_token        = %s" % access_token['oauth_token'])
+ print("    - oauth_token_secret = %s" % access_token['oauth_token_secret'])
+ fc.set('twitter','access_token_key',access_token['oauth_token'])
+ fc.set('twitter','access_token_secret',access_token['oauth_token_secret'])
+ fc.set("twitter","access_token_updated",datetime.datetime.now().strftime("%a %b %d %H:%M:%S +0000 %Y"))
