@@ -18,6 +18,7 @@ import urllib2
 import urlparse
 import oauth2 as oauth
 import json
+import os.path
 from termcolor import colored, cprint
 
     
@@ -78,6 +79,7 @@ def checkmentions():
  
  if mentionsok == True:
   mentions = twapi("/1.1/statuses/mentions_timeline.json?since_id=%s" % lastmention) 
+  mentions = twapi("/1.1/statuses/mentions_timeline.json") 
   minsfed = fc.getminsince("lastfed","datetime")
   
   cprint('ok', 'green', end='')
@@ -92,7 +94,6 @@ def checkmentions():
     
   txt = "%s last fed %s mins" % (txtmention,minsfed)
   cprint(txt,'yellow')
-
   for m in reversed(mentions):
    fs.incr("mentions")
    processmention(m)
@@ -117,85 +118,6 @@ def accountstats():
 		cprint('ok', 'green')
  except:
    cprint("Twitter API error %s" % (sys.exc_info()[0]),'red')
-
-
-#main stuff...
-
-# command line parsing
-parser = argparse.ArgumentParser(description='Feedtoby daemon')
-parser.add_argument('-c', help='configuration filename',action='store',dest='cfgfile',required=True)
-parser.add_argument('-o', help='only run once',action="store_true",dest='once',default=False)
-parser.add_argument('-a', help='oauth setup',action="store_true",dest='oauth',default=False)
-args = parser.parse_args()
-
-# setup logging
-#logging.basicConfig(level=logging.INFO)
-#log = logging.getLogger()
-
-# read config
-fc = FeedConfig.FeedConfig(args.cfgfile)
-
-fs = FeedStats.FeedStats(fc)
-fr = FeedRules.FeedRules(fc)
-
-if fc.getboolean('webserver', 'start') == True:
- websrv = FeedWebserver.FeedWebserver()
- websrv.webparams(fc)
- websrv.start()
-
-fs.incr("started")
-
-twconkey = fc.get('twitter', 'consumer_key')
-twconsec = fc.get('twitter', 'consumer_secret')
-
-# refresh access key and secret
-if args.oauth == True:
- oauthverify()
- sys.exit()
-
-twacckey = fc.get('twitter', 'access_token_key')
-twaccsec = fc.get('twitter', 'access_token_secret')
-
-cprint('Authenticating: ', 'cyan', end='')
-consumer = oauth.Consumer(key=twconkey, secret=twconsec)
-access_token = oauth.Token(key=twacckey, secret=twaccsec)
-client = oauth.Client(consumer, access_token)
-tweets = twapi("/1/statuses/home_timeline.json")
-if len(tweets) > 0:
- cprint('ok', 'green')
-else:
- sys.exit() 
-
-fs.incr("twitterverifyok")
-
-# print "Last mention %s at %s" % (fc.get('lastmention','id'),fc.get('lastmention','datetime'))
-
-# start operations
-accountstats()
-checkmentions()
-
-tmentions = time.time()
-taccstats = time.time()
-
-# main loop
-doloop = True
-while doloop == True:
-
- if args.once == True:
-  doloop = False
-
- if (time.time() - tmentions) > 30:
-  tmentions = time.time()
-  checkmentions()
-
- if (time.time() - taccstats) > 600:
-  taccstats = time.time()
-  accountstats()
-
- time.sleep(1)
-
-print("Exiting")
-sys.exit()
 
 
 def oauthverify():
@@ -239,3 +161,93 @@ def oauthverify():
  fc.set('twitter','access_token_key',access_token['oauth_token'])
  fc.set('twitter','access_token_secret',access_token['oauth_token_secret'])
  fc.set("twitter","access_token_updated",datetime.datetime.now().strftime("%a %b %d %H:%M:%S +0000 %Y"))
+
+
+#main stuff...
+
+# command line parsing
+parser = argparse.ArgumentParser(description='Feedtoby daemon')
+parser.add_argument('-c', help='configuration filename',action='store',dest='cfgfile',required=True)
+parser.add_argument('-o', help='only run once',action="store_true",dest='once',default=False)
+parser.add_argument('-a', help='oauth setup',action="store_true",dest='oauth',default=False)
+args = parser.parse_args()
+
+# setup logging
+#logging.basicConfig(level=logging.INFO)
+#log = logging.getLogger()
+
+# read config
+if os.path.isfile(args.cfgfile) == False:
+ cprint('Config file specified does not exist', 'red')
+ sys.exit()
+
+fc = FeedConfig.FeedConfig(args.cfgfile)
+
+fs = FeedStats.FeedStats(fc)
+fr = FeedRules.FeedRules(fc)
+
+if fc.getboolean('webserver', 'start') == True:
+ websrv = FeedWebserver.FeedWebserver()
+ websrv.webparams(fc)
+ websrv.start()
+
+fs.incr("started")
+
+twconkey = fc.get('twitter', 'consumer_key')
+twconsec = fc.get('twitter', 'consumer_secret')
+
+# refresh access key and secret
+if args.oauth == True:
+ oauthverify()
+ sys.exit()
+
+twacckey = fc.get('twitter', 'access_token_key')
+twaccsec = fc.get('twitter', 'access_token_secret')
+
+cprint('Authenticating: ', 'cyan', end='')
+consumer = oauth.Consumer(key=twconkey, secret=twconsec)
+access_token = oauth.Token(key=twacckey, secret=twaccsec)
+client = oauth.Client(consumer, access_token)
+tweets = twapi("/1/statuses/home_timeline.json")
+
+if len(tweets["errors"]) > 0:
+ cprint('oauth error','red')
+ sys.exit()
+else:
+ cprint('ok', 'green')
+
+mentions = twapi("/1.1/statuses/mentions_timeline.json") 
+print(mentions)
+
+fs.incr("twitterverifyok")
+
+# print "Last mention %s at %s" % (fc.get('lastmention','id'),fc.get('lastmention','datetime'))
+
+# start operations
+accountstats()
+checkmentions()
+
+tmentions = time.time()
+taccstats = time.time()
+
+# main loop
+doloop = True
+while doloop == True:
+
+ if args.once == True:
+  doloop = False
+
+ if (time.time() - tmentions) > 30:
+  tmentions = time.time()
+  checkmentions()
+
+ if (time.time() - taccstats) > 600:
+  taccstats = time.time()
+  accountstats()
+
+ time.sleep(1)
+
+print("Exiting")
+sys.exit()
+
+
