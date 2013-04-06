@@ -88,7 +88,7 @@ def checkmentions():
     
   txt = "%s last fed %s mins" % (txtmention,minsfed)
   cprint(txt,'yellow')
-  print(mentions)
+
   for m in reversed(mentions):
    fs.incr("mentions")
    processmention(m)
