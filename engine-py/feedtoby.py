@@ -69,20 +69,15 @@ def processmention(m):
 def checkmentions():
  cprint('Polling: ', 'cyan', end='')
  lastmention = fc.get('lastmention','id')
- mentionsok = False
- try:
-  mentions = twapi("/1.1/statuses/mentions_timeline.json?since_id=%s" % lastmention)
-  mennum = len(mentions)
-  mentionsok = True
- except:
-   cprint("Twitter API error %s" % (sys.exc_info()[0]),'red')
- 
- if mentionsok == True:
-  mentions = twapi("/1.1/statuses/mentions_timeline.json?since_id=%s" % lastmention) 
+ mentions = twapi("/1.1/statuses/mentions_timeline.json?since_id=%s" % lastmention)
+
+ if 'errors' in mentions:
+  cprint(mentions['errors'][0]['message'],'red') 
+ else:
   minsfed = fc.getminsince("lastfed","datetime")
   
   cprint('ok', 'green', end='')
-  
+  mennum = len(mentions)
   txtmention = ""
   if mennum == 0:
    txtmention= ""
@@ -93,6 +88,7 @@ def checkmentions():
     
   txt = "%s last fed %s mins" % (txtmention,minsfed)
   cprint(txt,'yellow')
+  print(mentions)
   for m in reversed(mentions):
    fs.incr("mentions")
    processmention(m)
@@ -102,8 +98,12 @@ def checkmentions():
 
 def twapi(url):
  endpoint = ("https://api.twitter.com%s" % url)
- response, data = client.request(endpoint)
- jsondata = json.loads(data)
+ try:
+  response, data = client.request(endpoint)
+  jsondata = json.loads(data)
+ except:
+  cprint("Twitter API error %s" % (sys.exc_info()[0]),'red')
+  sys.exit()
  return jsondata
 
 def accountstats():
