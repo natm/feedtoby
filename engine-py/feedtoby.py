@@ -229,16 +229,18 @@ taccstats = time.time()
 
 # main loop
 doloop = True
+feed_interval = float(self.cfg.get("rules","feed_interval"))
+stats_interval = float(self.cfg.get("rules","stats_interval"))
 while doloop == True:
 
  if args.once == True:
   doloop = False
 
- if (time.time() - tmentions) > 30:
+ if (time.time() - tmentions) > feed_interval:
   tmentions = time.time()
   checkmentions()
 
- if (time.time() - taccstats) > 600:
+ if (time.time() - taccstats) > stats_interval:
   taccstats = time.time()
   accountstats()
 
@@ -246,5 +248,3 @@ while doloop == True:
 
 print("Exiting")
 sys.exit()
-
-
