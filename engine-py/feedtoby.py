@@ -183,6 +183,12 @@ if os.path.isfile(args.cfgfile) == False:
 
 fc = FeedConfig.FeedConfig(args.cfgfile)
 
+instance_name = fc.get("instance","name")
+
+cprint('Redis: ', 'cyan', end='')
+fc.redis_connect()
+cprint("ok", 'green')
+
 fs = FeedStats.FeedStats(fc)
 fr = FeedRules.FeedRules(fc)
 
@@ -204,7 +210,7 @@ if args.oauth == True:
 twacckey = fc.get('twitter', 'access_token_key')
 twaccsec = fc.get('twitter', 'access_token_secret')
 
-cprint('Authenticating: ', 'cyan', end='')
+cprint('Twitter OAuth: ', 'cyan', end='')
 consumer = oauth.Consumer(key=twconkey, secret=twconsec)
 access_token = oauth.Token(key=twacckey, secret=twaccsec)
 client = oauth.Client(consumer, access_token)
@@ -229,14 +235,14 @@ taccstats = time.time()
 
 # main loop
 doloop = True
-feed_interval = float(self.cfg.get("rules","feed_interval"))
-stats_interval = float(self.cfg.get("rules","stats_interval"))
+poll_interval = fc.getfloat("rules","poll_interval")
+stats_interval = fc.getfloat("rules","stats_interval")
 while doloop == True:
 
  if args.once == True:
   doloop = False
 
- if (time.time() - tmentions) > feed_interval:
+ if (time.time() - tmentions) > poll_interval:
   tmentions = time.time()
   checkmentions()
 

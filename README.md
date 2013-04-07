@@ -11,15 +11,15 @@ Installation notes
 
 In a clean netinst'd vm:
 
-    apt-get install openssh-server sudo screen git-core python python-argparse python-oauth2 python-cherrypy python-imaging python-setuptools
+    apt-get install openssh-server sudo screen git-core python python-argparse python-oauth2 python-cherrypy python-imaging python-setuptools python-redis
 
 Add yourself to /etc/sudoers
 
-Install twython:
+Install tweepy fork:
 
     cd ~
-    git clone git://github.com/ryanmcgrath/twython.git
-    cd twython
+    git clone git://github.com/slothyrulez/tweepy.git
+    cd tweepy
     sudo python setup.py install
 
 Install termcolor:
@@ -107,9 +107,6 @@ Add public + private SSH keys to /home/nat/.ssh, create a dedicated user for thi
 Append these lines to /etc/rc.local
 
     su -l nat -c "/home/nat/reverse-ssh.sh microserf.flarg.net 2221" >/tmp/reverse-ssh.log &
-<<<<<<< HEAD
-=======
-    
     
     
     
@@ -129,4 +126,3 @@ Commit and push
 
     git commit -a -m "blah blah"
     git push origin master
->>>>>>> Updated readme

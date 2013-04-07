@@ -1,10 +1,12 @@
 import ConfigParser
 import datetime
+import redis
 
 class FeedConfig:
  """Feeder configuration routines"""
  cfg = None
  cfgname = ""
+ r = None
  
  def __init__(self,filename):
   self.cfg = ConfigParser.RawConfigParser()
@@ -53,3 +55,17 @@ class FeedConfig:
   
  def items(self,section):
   return self.cfg.items(section)
+
+ def redis_connect(self):
+  redis_host = self.cfg.get("redis","host")
+  redis_port = int(self.cfg.get("redis","port"))
+  redis_db = int(self.cfg.get("redis","db"))
+  redis_flush = self.cfg.getboolean("redis","flush")
+  self.r = redis.StrictRedis(host=redis_host,port=redis_port,db=redis_db)
+  if redis_flush == True:
+   self.r.flushdb()
+  return
+
+ def redis_set(self,key,value):
+  self.r.set(key,value)
+  return

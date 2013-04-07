@@ -20,7 +20,7 @@ class FeedAction:
   res = FeedResult.FeedResult()
   cw = CamWrapper.CamWrapper(self.cfg)
   
-  nanodetimeout = float(self.cfg.get("nanode","timeout"))
+  nanodetimeout = self.cfg.getfloat("nanode","timeout")
   
   cprint('Connecting to nanode: ', 'cyan', end='')
   try:

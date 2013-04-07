@@ -18,4 +18,4 @@ class FeedStats:
   if self.cfg.has_section("stats") == False:
    self.cfg.add_section("stats")
   self.cfg.set("stats",statname,int(statval))
-  
+  self.cfg.redis_set(("stats_%s" % statname),int(statval))
