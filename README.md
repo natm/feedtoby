@@ -117,6 +117,8 @@ Setting up dev environment
 --------------------------
 
     ssh git@github.com
+    git config --global user.name "natm"
+    git config --global user.email "nat@nuqe.net"
     git clone git@github.com:natm/feedtoby.git
 
 See whats changed
